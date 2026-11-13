@@ -1,17 +1,22 @@
-NAME = ft_ping
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -Iinclude
-SRCS	= src/main.c \
-		  src/parse.c \
-		  src/socket.c \
-		  src/packet.c \
-		  src/loop.c
-OBJS = $(SRCS:.c=.o)
+NAME	= ft_ping
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror -Iinclude
+LDFLAGS	= -lm
+
+SRCS	= src/main.c src/ping.c
+OBJS	= $(SRCS:.c=.o)
+
+all: $(NAME)
+
 $(NAME): $(OBJS)
-		$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LDFLAGS)
+
 clean:
-		rm -f $(OBJS)
+	rm -f $(OBJS)
+
 fclean: clean
-		rm -f $(NAME)
+	rm -f $(NAME)
+
 re: fclean all
+
 .PHONY: all clean fclean re

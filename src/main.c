@@ -1,35 +1,73 @@
-#include "../include/ft_ping.h"
+#include "ft_ping.h"
 
-static void init_context(t_ping *ctx)
+static void print_stats(t_ping *p)
 {
-    memset(ctx, 0, sizeof(t_ping));
-    ctx->sockfd = -1;
-    ctx->pid = (uint16_t)getpid();
-    ctx->stats.min_rtt = -1.0;
+    double avg;
+    double stddev;
+    double loss;
+
+    printf("--- %s ping statistics ---\n", p->host);
+    loss = p->sent ? ((double)(p->sent - p->received) / p->sent) * 100.0 : 0.0;
+    printf("%zu packets transmitted, %zu packets received, %.0f%% packet loss\n",
+           p->sent, p->received, loss);
+    if (p->received > 0)
+    {
+        avg = p->sum / p->received;
+        stddev = sqrt((p->sum_sq / p->received) - (avg * avg));
+        printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
+               p->min, avg, p->max, stddev);
+    }
+}
+
+static int init_target(t_ping *p)
+{
+    struct addrinfo hints;
+    struct addrinfo *res;
+    struct timeval tv = {1, 0};
+    int ttl = 64;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    if (getaddrinfo(p->host, NULL, &hints, &res) != 0)
+        return (fprintf(stderr, "ft_ping: unknown host %s\n", p->host), -1);
+    memcpy(&p->addr, res->ai_addr, sizeof(struct sockaddr_in));
+    inet_ntop(AF_INET, &p->addr.sin_addr, p->ip, sizeof(p->ip));
+    freeaddrinfo(res);
+    p->sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+    if (p->sockfd < 0)
+        return (perror("ft_ping: socket"), -1);
+    setsockopt(p->sockfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl));
+    setsockopt(p->sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+    return (0);
 }
 
 int main(int argc, char **argv)
 {
-    t_ping ctx;
+    t_ping p;
+    int opt;
 
-    init_context(&ctx);
-    if (parse_args(argc, argv, &ctx) < 0)
-        return (2);
-    if (getuid() != 0)
+    memset(&p, 0, sizeof(p));
+    p.pid = (uint16_t)getpid();
+    while ((opt = getopt(argc, argv, "v?")) != -1)
     {
-        fprintf(stderr, "ft_ping: socket: Operation not permitted (run as root)\n");
-        return (1);
+        if (opt == 'v')
+            p.verbose = true;
+        else
+            return (printf("Usage: ft_ping [-v?] destination\n"), opt != '?');
     }
-    if (resolve_target(&ctx) < 0)
+    if (optind >= argc)
+        return (fprintf(stderr, "ft_ping: missing host operand\n"), 2);
+    p.host = argv[optind];
+    if (getuid() != 0)
+        return (fprintf(stderr, "ft_ping: root privileges required\n"), 1);
+    if (init_target(&p) < 0)
         return (2);
-    if (setup_socket(&ctx) < 0)
-        return (1);
-    printf("PING %s (%s): %d data bytes",
-           ctx.target, ctx.ip_str, ICMP_PAYLOAD);
-    if (ctx.verbose)
-        printf(", id 0x%04x = %u", ctx.pid, ctx.pid);
+    printf("PING %s (%s): %d data bytes", p.host, p.ip, PAYLOAD_SIZE);
+    if (p.verbose)
+        printf(", id 0x%04x = %u", p.pid, p.pid);
     printf("\n");
-    ping_loop(&ctx);
-    close(ctx.sockfd);
+    ping_loop(&p);
+    print_stats(&p);
+    close(p.sockfd);
     return (0);
 }
