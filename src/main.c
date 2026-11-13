@@ -12,8 +12,11 @@ static void print_stats(t_ping *p)
            p->sent, p->received, loss);
     if (p->received > 0)
     {
+        double var;
+
         avg = p->sum / p->received;
-        stddev = sqrt((p->sum_sq / p->received) - (avg * avg));
+        var = (p->sum_sq / p->received) - (avg * avg);
+        stddev = (var > 0.0) ? sqrt(var) : 0.0;
         printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
                p->min, avg, p->max, stddev);
     }
@@ -53,7 +56,10 @@ int main(int argc, char **argv)
         if (opt == 'v')
             p.verbose = true;
         else
-            return (printf("Usage: ft_ping [-v?] destination\n"), opt != '?');
+        {
+            printf("Usage: ft_ping [-v?] destination\n");
+            return (optopt == '?' ? 0 : 64);
+        }
     }
     if (optind >= argc)
         return (fprintf(stderr, "ft_ping: missing host operand\n"), 2);

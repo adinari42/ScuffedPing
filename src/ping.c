@@ -83,8 +83,12 @@ static void recv_packet(t_ping *p)
                n - ip_len, src, ntohs(icmp->un.echo.sequence), ip->ttl, rtt);
     }
     else if (p->verbose && icmp->type != ICMP_ECHO && icmp->type != ICMP_ECHOREPLY)
-        printf("%zd bytes from %s: icmp type %u code %u\n",
-               n - ip_len, src, icmp->type, icmp->code);
+    {
+        const char *msg = (icmp->type == ICMP_TIME_EXCEEDED)
+                              ? "Time to live exceeded"
+                              : "Destination Unreachable";
+        printf("%zd bytes from %s: %s\n", n - ip_len, src, msg);
+    }
 }
 
 void ping_loop(t_ping *p)
