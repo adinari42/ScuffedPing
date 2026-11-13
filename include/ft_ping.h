@@ -21,10 +21,10 @@
 typedef struct s_stats{
     size_t  sent;
     size_t  received;
-    double  min_rrt;
-    double  max_rrt;
-    double  sum_rrt;
-    double  sum_sq_rrt;
+    double  min_rtt;
+    double  max_rtt;
+    double  sum_rtt;
+    double  sum_sq_rtt;
 
 }    t_stats;
 
