@@ -1,6 +1,6 @@
 NAME = ft_ping
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -Iinclude
+CFLAGS = -Wall -Wextra -Werror
 SRCS	= src/main.c \
 		  src/parse.c
 OBJS: $(NAME)
