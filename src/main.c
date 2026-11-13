@@ -29,7 +29,7 @@ int main(int argc, char **argv)
     if (ctx.verbose)
         printf(", id 0x%04x = %u", ctx.pid, ctx.pid);
     printf("\n");
-    send_ping(&ctx);
+    ping_loop(&ctx);
     close(ctx.sockfd);
     return (0);
 }
