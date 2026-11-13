@@ -1,9 +1,10 @@
 NAME = ft_ping
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -Iinclude
 SRCS	= src/main.c \
 		  src/parse.c \
-		  src/socket.c
+		  src/socket.c \
+		  src/packet.c
 OBJS = $(SRCS:.c=.o)
 $(NAME): $(OBJS)
 		$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
