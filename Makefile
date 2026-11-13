@@ -3,7 +3,7 @@ CC = cc
 CFLAGS = -Wall -Wextra -Werror
 SRCS	= src/main.c \
 		  src/parse.c
-OBJS: $(NAME)
+OBJS = $(SRCS:.c=.o)
 $(NAME): $(OBJS)
 		$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 clean:
