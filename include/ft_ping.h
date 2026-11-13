@@ -25,8 +25,8 @@ typedef struct s_stats{
     double  max_rrt;
     double  sum_rrt;
     double  sum_sq_rrt;
-    t_stats;
-}
+
+}    t_stats;
 
 typedef struct s_ping{
     int sockfd;
@@ -34,11 +34,11 @@ typedef struct s_ping{
     uint16_t    seq;
     bool    verbose;
     char    *target;
-    chat    ip_str[INET_ADDRSTRLEN];
+    char    ip_str[INET_ADDRSTRLEN];
     struct  sockaddr_in dest_addr;
     t_stats stats;
-    t_ping;
-}
+
+}    t_ping;
 
 int parse_args(int argc, char **argv, t_ping *ctx);
 void    print_usage(void);
