@@ -46,5 +46,7 @@ int parse_args(int argc, char **argv, t_ping *ctx);
 void print_usage(void);
 int resolve_target(t_ping *ctx);
 int setup_socket(t_ping *ctx);
+uint16_t	calc_checksum(const void *data, size_t len);
+int			send_ping(t_ping *ctx);
 
 #endif
