@@ -5,7 +5,7 @@ static void	init_context(t_ping *ctx)
 	memset(ctx, 0, sizeof(t_ping));
 	ctx->sockfd = -1;
 	ctx->pid = (uint16_t)getpid();
-	ctx->stats.min_rtt = -1.0;
+	ctx->stats.min_rrt = -1.0;
 }
 
 int	main(int argc, char **argv)
